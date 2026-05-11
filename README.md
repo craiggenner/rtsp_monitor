@@ -14,7 +14,29 @@ Copy and edit the example config:
 
 ```bash
 cp config.example.yaml config.yaml
+cp secrets.example.yaml secrets.yaml
 ```
+
+Edit `config.yaml` with your cameras (safe to commit) and `secrets.yaml` with credentials (gitignored).
+
+### Secrets
+
+Use `${VAR_NAME}` placeholders in `config.yaml` to reference values from `secrets.yaml`:
+
+**config.yaml** (safe to commit):
+```yaml
+cameras:
+  front_door:
+    url: "rtsp://${CAM_USER}:${CAM_PASS}@192.168.1.10:554/stream1"
+```
+
+**secrets.yaml** (gitignored):
+```yaml
+CAM_USER: "admin"
+CAM_PASS: "password123"
+```
+
+The secrets file is a flat YAML key-value map. Pass `--secrets /path/to/secrets.yaml` (default: `./secrets.yaml`). If the file doesn't exist, no substitution is performed.
 
 See [config.example.yaml](config.example.yaml) for all options with documentation.
 
@@ -34,7 +56,7 @@ See [config.example.yaml](config.example.yaml) for all options with documentatio
 ## Usage
 
 ```bash
-./rtsp-monitor --config config.yaml
+./rtsp-monitor --config config.yaml --secrets secrets.yaml
 ```
 
 Metrics are served at `http://localhost:2112/metrics` (or your configured port).

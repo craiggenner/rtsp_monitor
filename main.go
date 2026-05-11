@@ -17,9 +17,10 @@ import (
 
 func main() {
 	configPath := flag.String("config", "./config.yaml", "path to config file")
+	secretsPath := flag.String("secrets", "./secrets.yaml", "path to secrets file (optional, for ${VAR} substitution)")
 	flag.Parse()
 
-	cfg, err := config.Load(*configPath)
+	cfg, err := config.Load(*configPath, *secretsPath)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error loading config: %v\n", err)
 		os.Exit(1)

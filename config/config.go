@@ -27,10 +27,19 @@ type Config struct {
 	Settings Settings                 `yaml:"settings"`
 }
 
-func Load(path string) (*Config, error) {
+func Load(path string, secretsPath string) (*Config, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("reading config file: %w", err)
+	}
+
+	// Substitute secrets if a secrets file exists
+	if secretsPath != "" {
+		secrets, err := loadSecrets(secretsPath)
+		if err != nil {
+			return nil, err
+		}
+		data = substituteSecrets(data, secrets)
 	}
 
 	cfg := &Config{}
@@ -45,6 +54,33 @@ func Load(path string) (*Config, error) {
 	}
 
 	return cfg, nil
+}
+
+// loadSecrets reads a flat YAML key-value file (e.g. secrets.yaml).
+func loadSecrets(path string) (map[string]string, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("reading secrets file: %w", err)
+	}
+
+	raw := make(map[string]string)
+	if err := yaml.Unmarshal(data, &raw); err != nil {
+		return nil, fmt.Errorf("parsing secrets file: %w", err)
+	}
+
+	return raw, nil
+}
+
+// substituteSecrets replaces ${VAR_NAME} placeholders in the config data.
+func substituteSecrets(data []byte, secrets map[string]string) []byte {
+	result := string(data)
+	for key, value := range secrets {
+		result = strings.ReplaceAll(result, "${"+key+"}", value)
+	}
+	return []byte(result)
 }
 
 func applyDefaults(cfg *Config) {

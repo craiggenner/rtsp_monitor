@@ -4,7 +4,7 @@
 
 cameras:
   front_door:
-    url: "rtsp://admin:password@192.168.1.10:554/stream1"
+    url: "rtsp://${FRONT_DOOR_USER}:${FRONT_DOOR_PASS}@192.168.1.10:554/stream1"
     interval: 60        # Probe every 60 seconds (default: 60)
     timeout: 30         # Timeout per probe in seconds (default: 30)
     screenshots: false  # Save a JPEG screenshot per probe (default: false)
@@ -21,7 +21,7 @@ cameras:
 
   # Reolink cameras using HTTP-FLV (as used by Frigate)
   driveway:
-    url: "http://admin:password@192.168.1.13/flv?port=1935&app=bcs&stream=channel0_main.bcs"
+    url: "http://${DRIVEWAY_USER}:${DRIVEWAY_PASS}@192.168.1.13/flv?port=1935&app=bcs&stream=channel0_main.bcs"
     interval: 90
 
 settings:
