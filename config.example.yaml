@@ -1,0 +1,26 @@
+# RTSP Monitor — Example Configuration
+#
+# Copy this file to config.yaml and edit to match your cameras.
+
+cameras:
+  front_door:
+    url: "rtsp://admin:password@192.168.1.10:554/stream1"
+    interval: 60        # Probe every 60 seconds (default: 60)
+    timeout: 30         # Timeout per probe in seconds (default: 30)
+    screenshots: false  # Save a JPEG screenshot per probe (default: false)
+
+  back_garden:
+    url: "rtsp://192.168.1.11:554/live"
+    interval: 120
+    timeout: 45
+    screenshots: true
+
+  garage:
+    url: "rtsps://user:pass@192.168.1.12:322/cam/realmonitor"
+    # Uses all defaults: interval=60, timeout=30, screenshots=false
+
+settings:
+  metric_prefix: "rtsp"          # Prometheus metric prefix (default: "rtsp")
+  log_level: "info"              # debug | info | warn | error (default: "error")
+  screenshots_dir: "/data/shots" # Required if any camera has screenshots: true
+  port: 2112                     # HTTP port for /metrics endpoint (default: 2112)
