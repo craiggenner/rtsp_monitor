@@ -78,8 +78,9 @@ func validate(cfg *Config) error {
 		if cam.URL == "" {
 			return fmt.Errorf("camera %q: url is required", name)
 		}
-		if !strings.HasPrefix(cam.URL, "rtsp://") && !strings.HasPrefix(cam.URL, "rtsps://") {
-			return fmt.Errorf("camera %q: url must start with rtsp:// or rtsps://", name)
+		if !strings.HasPrefix(cam.URL, "rtsp://") && !strings.HasPrefix(cam.URL, "rtsps://") &&
+			!strings.HasPrefix(cam.URL, "http://") && !strings.HasPrefix(cam.URL, "https://") {
+			return fmt.Errorf("camera %q: url must start with rtsp://, rtsps://, http://, or https://", name)
 		}
 		if cam.Screenshots {
 			screenshotNeeded = true

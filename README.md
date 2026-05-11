@@ -22,7 +22,7 @@ See [config.example.yaml](config.example.yaml) for all options with documentatio
 
 | Setting | Default | Description |
 |---|---|---|
-| `cameras.<name>.url` | *(required)* | RTSP URL (`rtsp://` or `rtsps://`) |
+| `cameras.<name>.url` | *(required)* | Stream URL (`rtsp://`, `rtsps://`, `http://`, or `https://`) |
 | `cameras.<name>.interval` | `60` | Seconds between probes |
 | `cameras.<name>.timeout` | `30` | Probe timeout in seconds |
 | `cameras.<name>.screenshots` | `false` | Save a JPEG screenshot per probe |
@@ -65,8 +65,8 @@ groups:
 
 1. On startup, a goroutine is launched per camera.
 2. Each goroutine probes the RTSP stream at the configured interval.
-3. A probe connects to the RTSP URL, reads the stream for 5 seconds, then disconnects.
-4. The probe uses **gortsplib** (pure Go) by default. If that fails, it falls back to **ffmpeg** (must be on `PATH`).
+3. A probe connects to the stream URL, reads for 5 seconds, then disconnects.
+4. For RTSP URLs, the probe uses **gortsplib** (pure Go) by default, falling back to **ffmpeg**. For HTTP/HTTPS URLs (e.g. Reolink FLV), **ffmpeg** is used directly.
 5. When `screenshots: true`, ffmpeg is preferred (it can capture JPEG frames). Screenshots are saved to `<screenshots_dir>/<camera_name>/YYYY/MM/DD/HH:MM.jpg`.
 6. On `SIGINT`/`SIGTERM`, in-flight probes are cancelled and the process exits gracefully.
 

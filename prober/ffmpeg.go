@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -28,15 +29,17 @@ func (p *FFmpegProber) Probe(ctx context.Context, url string, wantScreenshot boo
 	return p.probeOnly(ctx, url, start)
 }
 
+func isRTSP(url string) bool {
+	return strings.HasPrefix(url, "rtsp://") || strings.HasPrefix(url, "rtsps://")
+}
+
 func (p *FFmpegProber) probeOnly(ctx context.Context, url string, start time.Time) (*Result, error) {
 	// Read stream for 5 seconds, discard output
-	args := []string{
-		"-rtsp_transport", "tcp",
-		"-i", url,
-		"-t", "5",
-		"-f", "null",
-		"-",
+	var args []string
+	if isRTSP(url) {
+		args = append(args, "-rtsp_transport", "tcp")
 	}
+	args = append(args, "-i", url, "-t", "5", "-f", "null", "-")
 
 	cmd := exec.CommandContext(ctx, "ffmpeg", args...)
 	cmd.Stdout = nil
@@ -61,16 +64,12 @@ func (p *FFmpegProber) probeWithScreenshot(ctx context.Context, url string, star
 
 	framePath := filepath.Join(tmpDir, "frame.jpg")
 
-	// Read stream for 5 seconds and capture a frame near the end
-	args := []string{
-		"-rtsp_transport", "tcp",
-		"-i", url,
-		"-t", "5",
-		"-frames:v", "1",
-		"-update", "1",
-		"-q:v", "2",
-		framePath,
+	// Read stream for 5 seconds and capture a frame
+	var args []string
+	if isRTSP(url) {
+		args = append(args, "-rtsp_transport", "tcp")
 	}
+	args = append(args, "-i", url, "-t", "5", "-frames:v", "1", "-update", "1", "-q:v", "2", framePath)
 
 	cmd := exec.CommandContext(ctx, "ffmpeg", args...)
 	cmd.Stdout = nil

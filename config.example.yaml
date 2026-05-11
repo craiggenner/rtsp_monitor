@@ -19,6 +19,11 @@ cameras:
     url: "rtsps://user:pass@192.168.1.12:322/cam/realmonitor"
     # Uses all defaults: interval=60, timeout=30, screenshots=false
 
+  # Reolink cameras using HTTP-FLV (as used by Frigate)
+  driveway:
+    url: "http://admin:password@192.168.1.13/flv?port=1935&app=bcs&stream=channel0_main.bcs"
+    interval: 90
+
 settings:
   metric_prefix: "rtsp"          # Prometheus metric prefix (default: "rtsp")
   log_level: "info"              # debug | info | warn | error (default: "error")

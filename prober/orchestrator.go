@@ -3,6 +3,7 @@ package prober
 import (
 	"context"
 	"log/slog"
+	"strings"
 	"sync"
 	"time"
 
@@ -78,8 +79,13 @@ func (o *Orchestrator) probeCamera(ctx context.Context, name string, cam *config
 	var result *Result
 	var err error
 
-	if cam.Screenshots {
-		// When screenshots are needed, use ffmpeg (it can capture JPEG frames).
+	isHTTP := strings.HasPrefix(cam.URL, "http://") || strings.HasPrefix(cam.URL, "https://")
+
+	if isHTTP {
+		// HTTP/HTTPS URLs (e.g. Reolink FLV) — only ffmpeg can handle these.
+		result, err = o.ffProbe.Probe(probeCtx, cam.URL, cam.Screenshots)
+	} else if cam.Screenshots {
+		// RTSP with screenshots — use ffmpeg (it can capture JPEG frames).
 		// Fall back to gortsplib if ffmpeg is unavailable.
 		result, err = o.ffProbe.Probe(probeCtx, cam.URL, true)
 		if err != nil {
@@ -87,7 +93,7 @@ func (o *Orchestrator) probeCamera(ctx context.Context, name string, cam *config
 			result, err = o.goProbe.Probe(probeCtx, cam.URL, false)
 		}
 	} else {
-		// No screenshots needed — prefer gortsplib, fall back to ffmpeg.
+		// RTSP without screenshots — prefer gortsplib, fall back to ffmpeg.
 		result, err = o.goProbe.Probe(probeCtx, cam.URL, false)
 		if err != nil {
 			slog.Warn("gortsplib probe failed, trying ffmpeg fallback", "camera", name, "error", err)
