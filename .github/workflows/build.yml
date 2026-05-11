@@ -18,10 +18,10 @@ jobs:
           go-version-file: go.mod
 
       - name: Build linux/amd64
-        run: GOOS=linux GOARCH=amd64 go build -o rtsp-monitor-linux-amd64 .
+        run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o rtsp-monitor-linux-amd64 .
 
       - name: Build linux/arm64
-        run: GOOS=linux GOARCH=arm64 go build -o rtsp-monitor-linux-arm64 .
+        run: CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o rtsp-monitor-linux-arm64 .
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
